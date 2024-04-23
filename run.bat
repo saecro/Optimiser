@@ -21,7 +21,7 @@ if not exist token.json (
   exit
 )
 
-rem Validate the token
+echo Validate the token
 node js/validateToken.js
 if errorlevel 1 (
   echo Invalid token. Please provide a valid token in token.json.
