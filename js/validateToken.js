@@ -21,7 +21,7 @@ async function main() {
     const validTokens = await getTokens();
 
     try {
-        const tokenData = fs.readFileSync('token.json');
+        const tokenData = fs.readFileSync('config.json');
         const { token } = JSON.parse(tokenData);
 
         if (validTokens.includes(token)) {

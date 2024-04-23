@@ -21,8 +21,8 @@ node js/fix.js
 @REM node ./js/updater.js
 
 
-if not exist token.json (
-  echo token.json not found. Please create the file with a valid token.
+if not exist config.json (
+  echo config.json not found. Please create the file with a valid token.
   pause
   exit
 )
@@ -30,7 +30,7 @@ if not exist token.json (
 echo Validate the token
 node js/validateToken.js
 if errorlevel 1 (
-  echo Invalid token. Please provide a valid token in token.json.
+  echo Invalid token. Please provide a valid token in config.json.
   pause
   exit
 )
@@ -46,11 +46,10 @@ echo [3] Disk cleanup
 echo [4] Defragment disk
 echo [5] Update drivers
 echo [6] Disable startup programs
-echo [7] Scan for malware
+echo [7] Run a discord bot
 echo [8] Optimize network settings
 echo [9] Repair system files
 echo [10] Manage power settings
-echo [11] Settings
 echo.
 set /p o=
 if %o% == 1 goto PCStats
@@ -59,11 +58,10 @@ if %o% == 3 goto diskCleanup
 if %o% == 4 goto defragDisk
 if %o% == 5 goto updateDrivers
 if %o% == 6 goto disableStartup
-if %o% == 7 goto scanMalware
+if %o% == 7 goto runDiscordBot
 if %o% == 8 goto optimizeNetwork
 if %o% == 9 goto repairSystem
 if %o% == 10 goto powerSettings
-if %o% == 11 goto config
 pause
 goto ui
 :PCStats
@@ -98,7 +96,7 @@ pause
 goto ui
 :scanMalware
 cls
-node ./js/scanMalware.js
+node ./js/runDiscordBot.js
 pause
 goto ui
 :optimizeNetwork
@@ -114,10 +112,5 @@ goto ui
 :powerSettings
 cls
 node ./js/powerSettings.js
-pause
-goto ui
-:config
-cls
-node js/settings.js
 pause
 goto ui
