@@ -41,7 +41,7 @@ title PC Optimiser V1 by saecro
 echo option select
 echo.
 echo [1] Get PC stats
-echo [2] Clear temp folder
+echo [2] Clear Useless Files
 echo [3] Disk cleanup
 echo [4] Defragment disk
 echo [5] Update drivers
@@ -53,7 +53,7 @@ echo [10] Manage power settings
 echo.
 set /p o=
 if %o% == 1 goto PCStats
-if %o% == 2 goto clearTemp
+if %o% == 2 goto clearFiles
 if %o% == 3 goto diskCleanup
 if %o% == 4 goto defragDisk
 if %o% == 5 goto updateDrivers
@@ -69,10 +69,15 @@ cls
 node ./js/getPerformanceStats.js
 pause
 goto ui
-:clearTemp
+:clearFiles
 cls
-node ./js/clearTemp.js
+echo WARNING THIS WILL DELETE THE FOLLOWING:
+echo 1. DOWNLOADS
+echo 2. RECYCLING BIN
+echo 3. TEMPORARY FILES
+echo CTRL+C IF YOU DO NOT WANT TO CLEAR ANY OF THOSE FILES NOW.
 pause
+node ./js/clearFiles.js
 goto ui
 :diskCleanup
 cls

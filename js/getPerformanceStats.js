@@ -1,48 +1,37 @@
 const os = require('os');
 
-function cpuAverage() {
-    var totalIdle = 0,
-        totalTick = 0;
-    var cpus = os.cpus();
-    for (var i = 0, len = cpus.length; i < len; i++) {
-        var cpu = cpus[i];
-        for (type in cpu.times) {
-            totalTick += cpu.times[type];
-        }
-        totalIdle += cpu.times.idle;
-    }
-    return { idle: totalIdle / cpus.length, total: totalTick / cpus.length };
-}
-const arrAvg = function (arr) {
-    if (arr && arr.length >= 1) {
-        const sumArr = arr.reduce((a, b) => a + b, 0);
-        return sumArr / arr.length;
-    }
+// Get CPU information
+const cpus = os.cpus();
+const cpuSpeed = cpus[0].speed;
+
+// Get RAM information
+const totalRAM = os.totalmem();
+const freeRAM = os.freemem();
+const usedRAM = totalRAM - freeRAM;
+const osUptime = os.uptime();
+
+// Format values
+const formatBytes = (bytes) => {
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  if (bytes === 0) return '0 Bytes';
+  const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
+  return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
 };
 
-function getCPULoadAVG(avgTime = 2000, delay = 100) {
-    return new Promise((resolve, reject) => {
-        const n = ~~(avgTime / delay);
-        if (n <= 1) {
-            reject("Error: interval to small");
-        }
-        let i = 0;
-        let samples = [];
-        const avg1 = cpuAverage();
-        let interval = setInterval(() => {
-            if (i >= n) {
-                clearInterval(interval);
-                resolve(~~(arrAvg(samples) * 100));
-            }
-            const avg2 = cpuAverage();
-            const totalDiff = avg2.total - avg1.total;
-            const idleDiff = avg2.idle - avg1.idle;
-            samples[i] = 1 - idleDiff / totalDiff;
-            i++;
-        }, delay);
-    });
-}
-async function main() {
-    console.log(await getCPULoadAVG())
-}
-main()
+
+const formatTime = (seconds) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${hours} hours, ${minutes} minutes, ${secs} seconds`;
+};
+
+// Print system information
+console.log('=== System Information ===');
+console.log(`CPU Speed: ${(cpuSpeed/1000).toFixed(2)} GHz`);
+console.log('---------------------------');
+console.log(`Total RAM: ${formatBytes(totalRAM)}`);
+console.log(`Used RAM: ${formatBytes(usedRAM)}`);
+console.log(`Free RAM: ${formatBytes(freeRAM)}`);
+console.log('---------------------------');
+console.log(`System Uptime: ${formatTime(osUptime)}`);
