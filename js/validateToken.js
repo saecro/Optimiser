@@ -10,7 +10,6 @@ const tokenSchema = new mongoose.Schema({
 
 const Token = mongoose.model('Token', tokenSchema)
 async function getTokens() {
-    console.log('getting tokens')
     const tokens = await Token.find();
     returnlist = []
     tokens.forEach(token => {
@@ -20,21 +19,17 @@ async function getTokens() {
 }
 async function main() {
     const validTokens = await getTokens();
-    console.log(validTokens);
 
     try {
         const tokenData = fs.readFileSync('token.json');
         const { token } = JSON.parse(tokenData);
 
         if (validTokens.includes(token)) {
-            console.log('Token validation successful.');
             process.exit(0);
         } else {
-            console.log('Invalid token.');
             process.exit(1);
         }
-    } catch (error) {
-        console.log('Error reading token.json:', error);
+    } catch (_) {
         process.exit(1);
     }
 }
