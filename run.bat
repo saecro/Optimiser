@@ -1,5 +1,6 @@
 @echo off
 rem Checking if node.js is installed
+
 where node.exe >nul 2>&1 && set message=true || set message=false
 if exist node.msi del node.msi
 if %message% == false (
@@ -15,6 +16,11 @@ echo fail
 )
 )
 
+echo verifying modules...
+node js/fix.js
+@REM node ./js/updater.js
+
+
 if not exist token.json (
   echo token.json not found. Please create the file with a valid token.
   pause
@@ -28,9 +34,7 @@ if errorlevel 1 (
   pause
   exit
 )
-echo verifying modules...
-node js/fix.js
-@REM node ./js/updater.js
+
 :ui
 cls
 title PC Optimiser V1 by saecro
