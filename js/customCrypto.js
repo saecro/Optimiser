@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 
 function generateRandomString(length) {
-  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+{}[];:,.<>?';
+  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+{}[];~:,.<>?';
   let result = '';
 
   const randomBytes = crypto.randomBytes(length);
