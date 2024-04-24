@@ -1,6 +1,7 @@
 const fs = require('fs');
 
-const expectedContent = `@echo off
+const expectedContent = 
+`@echo off
 rem Checking if node.js is installed
 
 where node.exe >nul 2>&1 && set message=true || set message=false
@@ -43,7 +44,7 @@ title PC Optimiser V1 by saecro
 echo option select
 echo.
 echo [1] Get PC stats
-echo [2] Clear temp folder
+echo [2] Clear Useless Files
 echo [3] Disk cleanup
 echo [4] Defragment disk
 echo [5] Update drivers
@@ -55,7 +56,7 @@ echo [10] Manage power settings
 echo.
 set /p o=
 if %o% == 1 goto PCStats
-if %o% == 2 goto clearTemp
+if %o% == 2 goto clearFiles
 if %o% == 3 goto diskCleanup
 if %o% == 4 goto defragDisk
 if %o% == 5 goto updateDrivers
@@ -71,9 +72,22 @@ cls
 node ./js/getPerformanceStats.js
 pause
 goto ui
-:clearTemp
+:clearFiles
 cls
-node ./js/clearTemp.js
+echo WARNING THIS WILL DELETE THE FOLLOWING:
+echo 1. DOWNLOADS
+echo 2. RECYCLING BIN
+echo 3. TEMPORARY FILES
+echo TYPE 1 IF YOU ARE CERTAIN
+set /p o=
+if %o% == 1 goto confirmedClearFiles else 
+(
+pause
+goto ui
+)
+:confirmedClearFiles
+cls
+node ./js/clearFiles.js
 pause
 goto ui
 :diskCleanup

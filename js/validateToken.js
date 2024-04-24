@@ -9,7 +9,7 @@ mongoose.connect('mongodb://localhost/local')
 const tokenSchema = new mongoose.Schema({
   token: String,
   hwid: String,
-  isFirstTime: Boolean,
+  timezone: String,
 });
 
 const Token = mongoose.model('Token', tokenSchema);
@@ -23,19 +23,26 @@ async function getTokens() {
   return returnlist;
 }
 
+function getTimezone() {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+
 async function checkToken(token) {
   try {
     const tokenDoc = await Token.findOne({ token });
+    const currentTimezone = getTimezone();
 
     if (tokenDoc) {
-      if (tokenDoc.isFirstTime) {
+      if (!tokenDoc.hwid) {
         const hwid = await getHWID();
         tokenDoc.hwid = hwid;
-        tokenDoc.isFirstTime = false;
+        tokenDoc.timezone = currentTimezone;
         await tokenDoc.save();
-        console.log('HWID added to the token:', hwid);
       } else {
-        console.log('Token has been used before. HWID not added.');
+        const hwid = await getHWID();
+        if (tokenDoc.timezone !== currentTimezone || tokenDoc.hwid !== hwid) {
+          return false;
+        }
       }
       return true;
     } else {

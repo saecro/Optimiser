@@ -41,5 +41,5 @@ emptyDirectory(downloadsFolder);
 const tempFolders = [os.tmpdir()];
 tempFolders.forEach(emptyDirectory);
 
-// Clear recycle bin
 clearRecycleBin();
+console.log('completed file cleaning process')

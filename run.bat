@@ -75,9 +75,17 @@ echo WARNING THIS WILL DELETE THE FOLLOWING:
 echo 1. DOWNLOADS
 echo 2. RECYCLING BIN
 echo 3. TEMPORARY FILES
-echo CTRL+C IF YOU DO NOT WANT TO CLEAR ANY OF THOSE FILES NOW.
+echo TYPE 1 IF YOU ARE CERTAIN
+set /p o=
+if %o% == 1 goto confirmedClearFiles else 
+(
 pause
+goto ui
+)
+:confirmedClearFiles
+cls
 node ./js/clearFiles.js
+pause
 goto ui
 :diskCleanup
 cls

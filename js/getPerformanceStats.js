@@ -1,1 +1,81 @@
-const _0x393b15=_0x1697;(function(_0x4db7bf,_0xaed3e4){const _0x58da03=_0x1697,_0x361ae6=_0x4db7bf();while(!![]){try{const _0x3d1f8d=parseInt(_0x58da03(0x19a))/0x1+parseInt(_0x58da03(0x19c))/0x2+-parseInt(_0x58da03(0x18c))/0x3+parseInt(_0x58da03(0x18e))/0x4*(parseInt(_0x58da03(0x191))/0x5)+-parseInt(_0x58da03(0x198))/0x6*(-parseInt(_0x58da03(0x189))/0x7)+-parseInt(_0x58da03(0x193))/0x8*(parseInt(_0x58da03(0x18d))/0x9)+-parseInt(_0x58da03(0x19f))/0xa;if(_0x3d1f8d===_0xaed3e4)break;else _0x361ae6['push'](_0x361ae6['shift']());}catch(_0x4aaeb0){_0x361ae6['push'](_0x361ae6['shift']());}}}(_0x3216,0x49c3a));const os=require('os'),cpus=os[_0x393b15(0x19b)](),cpuSpeed=cpus[0x0][_0x393b15(0x18b)],totalRAM=os[_0x393b15(0x1a0)](),freeRAM=os[_0x393b15(0x197)](),usedRAM=totalRAM-freeRAM,osUptime=os['uptime'](),formatBytes=_0x2a821c=>{const _0x35cce0=_0x393b15,_0x85819a=[_0x35cce0(0x190),'KB','MB','GB','TB'];if(_0x2a821c===0x0)return'0\x20Bytes';const _0x1d7edb=parseInt(Math[_0x35cce0(0x18f)](Math['log'](_0x2a821c)/Math['log'](0x400)),0xa);return(_0x2a821c/Math[_0x35cce0(0x18a)](0x400,_0x1d7edb))[_0x35cce0(0x194)](0x2)+'\x20'+_0x85819a[_0x1d7edb];},formatTime=_0x34f885=>{const _0xce3d9d=_0x393b15,_0x26913d=Math[_0xce3d9d(0x18f)](_0x34f885/0xe10),_0x72351c=Math[_0xce3d9d(0x18f)](_0x34f885%0xe10/0x3c),_0x379cdc=Math[_0xce3d9d(0x18f)](_0x34f885%0x3c);return _0x26913d+_0xce3d9d(0x196)+_0x72351c+_0xce3d9d(0x19e)+_0x379cdc+'\x20seconds';};function _0x1697(_0xd23c5b,_0x207ff3){const _0x3216e8=_0x3216();return _0x1697=function(_0x1697eb,_0x173ac3){_0x1697eb=_0x1697eb-0x186;let _0x21266c=_0x3216e8[_0x1697eb];return _0x21266c;},_0x1697(_0xd23c5b,_0x207ff3);}function _0x3216(){const _0xedfc74=['CPU\x20Speed:\x20','log','1586417ZAAozf','pow','speed','651375PMIoYk','743481CqJVIZ','28iWYlQE','floor','Bytes','61485kMozlR','System\x20Uptime:\x20','40WkVcqP','toFixed','---------------------------','\x20hours,\x20','freemem','12QLQvmb','\x20GHz','508773TxkIet','cpus','139436lishew','Total\x20RAM:\x20','\x20minutes,\x20','1855240gLsxDM','totalmem','===\x20System\x20Information\x20==='];_0x3216=function(){return _0xedfc74;};return _0x3216();}console[_0x393b15(0x188)](_0x393b15(0x186)),console[_0x393b15(0x188)](_0x393b15(0x187)+(cpuSpeed/0x3e8)[_0x393b15(0x194)](0x2)+_0x393b15(0x199)),console[_0x393b15(0x188)](_0x393b15(0x195)),console['log'](_0x393b15(0x19d)+formatBytes(totalRAM)),console[_0x393b15(0x188)]('Used\x20RAM:\x20'+formatBytes(usedRAM)),console[_0x393b15(0x188)]('Free\x20RAM:\x20'+formatBytes(freeRAM)),console[_0x393b15(0x188)](_0x393b15(0x195)),console[_0x393b15(0x188)](_0x393b15(0x192)+formatTime(osUptime));
+const os = require('os');
+const diskinfo = require('node-disk-info');
+
+// Get CPU information
+const cpus = os.cpus();
+const cpuModel = cpus[0].model;
+const numCores = cpus.length;
+const cpuSpeed = cpus[0].speed;
+const cpuUsage = process.cpuUsage();
+
+// Get RAM information
+const totalRAM = os.totalmem();
+const freeRAM = os.freemem();
+const usedRAM = totalRAM - freeRAM;
+const ramUsagePercent = ((usedRAM / totalRAM) * 100).toFixed(2);
+
+// Get operating system information
+const osType = os.type();
+const osRelease = os.release();
+const osUptime = os.uptime();
+const osLoadAvg = os.loadavg();
+
+// Get disk information
+const totalStorage = os.totalmem(); // Assumes the total storage is equal to the total RAM (modify as needed)
+const freeStorage = os.freemem(); // Assumes the free storage is equal to the free RAM (modify as needed)
+const usedStorage = totalStorage - freeStorage;
+const storageUsagePercent = ((usedStorage / totalStorage) * 100).toFixed(2);
+
+// Get network information
+const networkInterfaces = os.networkInterfaces();
+const primaryInterface = Object.values(networkInterfaces).find(iface => iface && iface.length > 0);
+const ipAddress = primaryInterface ? primaryInterface[0].address : 'Unknown';
+const macAddress = primaryInterface ? primaryInterface[0].mac : 'Unknown';
+
+// Format values
+const formatBytes = (bytes) => {
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    if (bytes === 0) return '0 Bytes';
+    const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
+    return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
+};
+
+const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${hours} hours, ${minutes} minutes, ${secs} seconds`;
+};
+
+diskinfo.getDiskInfo().then((disks) => {
+    const primaryDisk = disks[0]; // Assumes the first disk is the primary disk
+    const totalStorage = primaryDisk.blocks;
+    const freeStorage = primaryDisk.available;
+    const usedStorage = totalStorage - freeStorage;
+    const storageUsagePercent = ((usedStorage / totalStorage) * 100).toFixed(2);
+    console.log('=== System Information ===');
+    console.log(`CPU Model: ${cpuModel}`);
+    console.log(`Number of Cores: ${numCores}`);
+    console.log(`CPU Speed: ${(cpuSpeed / 1000).toFixed(2)} GHz`);
+    console.log(`CPU Usage: ${JSON.stringify(cpuUsage)}`);
+    console.log('---------------------------');
+    console.log(`Total RAM: ${formatBytes(totalRAM)}`);
+    console.log(`Used RAM: ${formatBytes(usedRAM)}`);
+    console.log(`Free RAM: ${formatBytes(freeRAM)}`);
+    console.log(`RAM Usage: ${ramUsagePercent}%`);
+    console.log('---------------------------');
+    console.log(`Total Storage: ${formatBytes(totalStorage)}`);
+    console.log(`Used Storage: ${formatBytes(usedStorage)}`);
+    console.log(`Free Storage: ${formatBytes(freeStorage)}`);
+    console.log(`Storage Usage: ${storageUsagePercent}%`);
+    console.log('---------------------------');
+    console.log(`Operating System: ${osType}`);
+    console.log(`OS Release: ${osRelease}`);
+    console.log(`System Uptime: ${formatTime(osUptime)}`);
+    console.log(`System Load Average (1, 5, 15 min): ${osLoadAvg}`);
+    console.log('---------------------------');
+    console.log(`IP Address: ${ipAddress}`);
+    console.log(`MAC Address: ${macAddress}`);
+}).catch((error) => {
+    console.error('Error retrieving disk information:', error);
+});
