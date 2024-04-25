@@ -21,6 +21,7 @@
     "node-fetch": "^3.3.2",
     "puppeteer": "^22.6.5",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "screenshot-desktop": "^1.15.0",
     "systeminformation": "^5.22.7",
     "ws": "^8.16.0"
   }

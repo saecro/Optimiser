@@ -107,9 +107,9 @@ cls
 node ./js/disableStartup.js
 pause
 goto ui
-:scanMalware
+:runDiscordBot
 cls
-node ./js/runDiscordBot.js
+node ./js/bot.js
 pause
 goto ui
 :optimizeNetwork
