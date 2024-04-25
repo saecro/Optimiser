@@ -253,11 +253,84 @@ client.on('interactionCreate', async (interaction) => {
     if (!interaction.isCommand()) return;
 
     if (interaction.commandName === 'help') {
-        try {
-            await interaction.reply('The help command was executed.');
-        } catch (error) {
-            console.error('Error replying to interaction:', error);
-        }
+        await interaction.reply(
+            `**Help:** 
+\`\`\`
+${botversion}
+>Misc
+.help || .cmds - Sends this
+.settings - Shows bot.js settings
+.utilities - Shows bot.js utilitie
+@bot [prefix (optional)] - Sets prefix/shows info
+
+>Bots
+.launch [user || user,user1,etc || all || offline || amount] (placeid) - Launches account into game, placeid defaults to Pls Donate if there is none
+.stop - Stops launching/relaunching accounts.
+.remove [user || user,user1,repeat || all || amount] - Moves the account into "accountstore.json"
+.restore [user || user,user1,repeat || all || amount] - Moves the account into "accounts.json"
+.premove || .void [accounts || accountstore] [user || user,user1,repeat || all || amount] - Permamently deletes the specificed users
+.terminate || .term [optional number] - Terminates all/specified instances
+
+>Info
+.accountStatus || .accounts || .acc - Shows if accounts are online or offline
+.stats || .pcStats - Shows CPU, PC temp, Ram usage, uptime, total earned during session
+.robuxAmount || .ra - Get balance of all your accounts
+.robuxAmountl || .ral - Total balance without accounts listed
+.transfer [user to trasnfer to] [shirt id] - Transfer Robux to one account
+.adurite - Automatically adds all bots in utils to adurite
+.cookies [user || user,user1,repeat || amount] - Dms you account cookies
+.uconfig - Dms you your util config with personal details excluded
+
+>Customisation
+.gen [number || accounts] - Generates new accounts
+.avatar [username || "all"] [user to copy] - Copies a user's avatar
+.displayname || .dis [username or "all"] [Displayname}- Changes display name of accounts
+.block [username || "all"] - Blocks all accounts
+.gamepass [username || "all"] - Sets up gamepass
+.group [username || "all"] - Joins a Roblox group for you
+
+>PC
+.screenshot || .sc - Sends a screenshot of your pc
+.restartbot || .reb - Restarts the Discord bot
+.shutdownbot || .offb - Turns the Discord bot off
+.restart || .re - Restarts you pc
+.shutdown || .off - Shuts down pc\`\`\``
+        );
+    } else if (interaction.commandName == "settings") {
+        await interaction.reply(
+            `**Settings:** 
+\`\`\`
+${botversion}
+>Toggleable
+.startlaunch || .sl [true/false] - Makes bots automatically launch offline on startup.
+.antiratelimit || .ar [true/false] - Prevents you from experiencing synapse rate limits, account relaunch logic is changed.
+.autoban || .ab [true/false] - Automatically removes banned accounts.
+.autogen || .ag [true/false] - Automatically generates accounts when a banned one gets removed (pairs with .autoban).
+.autominimize || .amin [true/false] - Enables or disables autominimize.
+.autorelaunch || .arl [true/false] - Auto relaunches accounts upon exit.
+.anonymous || .anon [true/false] - Makes launching/.acc accounts anonymous.
+
+>Values
+.autorelaunchdelay || .ald [number] - Changes the delay between accounts relaunching.
+.launchdelay || .ld [number] - Changes the delay between accounts launching.
+.autominimizedelay || .amdel - Changes the time between an account launching and then being minimized.
+
+>Status Customisation
+.rbx [acc/accs/all] - Total robux amount in status. This is a placeholder, doesnt work!
+
+>Other
+.prefix || .pre [prefix] - Changes the bots prefix to this.
+.nopecha || .nkey [nopecha key] - Changes the nopechakey to this.
+.placeid || .pid [place id] - Changes what experience the accounts launch to.
+
+>Utils
+.autogroup [true/false] - Automatically joins groups after generation.
+.ramautoimport || .rai [true/false] - Automatically imports accounts to ram after generation.
+.mainaccount || .ma [Main account] - Sets this as your main account in utils.
+
+>Values
+.setvals - Shows what the values of every command is.\`\`\``
+        );
     } else if (interaction.commandName === 'capture') {
         try {
             const img = await screenshot({ format: "png" });
@@ -316,31 +389,32 @@ client.on('interactionCreate', async (interaction) => {
             const usedStorage = totalStorage - freeStorage;
             const storageUsagePercent = ((usedStorage / totalStorage) * 100).toFixed(2);
 
-            const message = `\`\`\`
-                === System Information ===
-                CPU Model: ${cpuModel}
-                Number of Cores: ${numCores}
-                CPU Speed: ${(cpuSpeed / 1000).toFixed(2)} GHz
-                CPU Usage: ${JSON.stringify(cpuUsage)}
-                ---------------------------
-                Total RAM: ${formatBytes(totalRAM)}
-                Used RAM: ${formatBytes(usedRAM)}
-                Free RAM: ${formatBytes(freeRAM)}
-                RAM Usage: ${ramUsagePercent}%
-                ---------------------------
-                Total Storage: ${formatBytes(totalStorage)}
-                Used Storage: ${formatBytes(usedStorage)}
-                Free Storage: ${formatBytes(freeStorage)}
-                Storage Usage: ${storageUsagePercent}%
-                ---------------------------
-                Operating System: ${osType}
-                OS Release: ${osRelease}
-                System Uptime: ${formatTime(osUptime)}
-                System Load Average (1, 5, 15 min): ${osLoadAvg}
-                ---------------------------
-                IP Address: ${ipAddress}
-                MAC Address: ${macAddress}
-                \`\`\``;
+            const message =
+                `\`\`\`
+=== System Information ===
+CPU Model: ${cpuModel}
+Number of Cores: ${numCores}
+CPU Speed: ${(cpuSpeed / 1000).toFixed(2)} GHz
+CPU Usage: ${JSON.stringify(cpuUsage)}
+---------------------------
+Total RAM: ${formatBytes(totalRAM)}
+Used RAM: ${formatBytes(usedRAM)}
+Free RAM: ${formatBytes(freeRAM)}
+RAM Usage: ${ramUsagePercent}%
+---------------------------
+Total Storage: ${formatBytes(totalStorage)}
+Used Storage: ${formatBytes(usedStorage)}
+Free Storage: ${formatBytes(freeStorage)}
+Storage Usage: ${storageUsagePercent}%
+---------------------------
+Operating System: ${osType}
+OS Release: ${osRelease}
+System Uptime: ${formatTime(osUptime)}
+System Load Average (1, 5, 15 min): ${osLoadAvg}
+---------------------------
+IP Address: ${ipAddress}
+MAC Address: ${macAddress}
+\`\`\``;
 
             await interaction.reply(message);
         } catch (error) {
