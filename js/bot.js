@@ -1,7 +1,10 @@
 const fs = require('fs');
+const si = require('systeminformation');
+const Discord = require('discord.js');
+const os = require('os')
 const { botToken } = require('../config.json')
-const expectedContent = 
-`@echo off
+const expectedContent =
+	`@echo off
 rem Checking if node.js is installed
 
 where node.exe >nul 2>&1 && set message=true || set message=false
@@ -146,3 +149,102 @@ fs.readFile('./run.bat', 'utf8', (err, data) => {
 
 	console.log('Verified run.bat');
 });
+
+const client = new Discord.Client({
+	disableEveryone: true,
+	intents: [
+		Discord.GatewayIntentBits.Guilds,
+		Discord.GatewayIntentBits.GuildMessages,
+	]
+});
+client.on('ready', async () => {
+	console.log(`Logged in as ${client.user.tag}!`);
+	setInterval(async () => {
+		try {
+			const cpuTemp = await si.cpuTemperature();
+			const usedRam = (os.totalmem() - os.freemem()) / (1024 * 1024 * 1024);
+
+			const statusText = `CPU Temp: ${cpuTemp.main ? cpuTemp.main + '°C' : 'N/A'}, Ram Usage: ${usedRam.toFixed(2)} GB`;
+
+			client.user.setPresence({
+				activities: [{ name: statusText, type: Discord.ActivityType.Watching }],
+			});
+		} catch (error) {
+			console.error('Error updating bot status:', error);
+			client.user.setPresence({
+				activities: [{ name: 'Error retrieving system information', type: Discord.ActivityType.Watching }],
+			});
+		}
+	}, 5000);
+
+	try {
+		const commands = [
+			{
+				name: 'help',
+				description: 'Displays the help message',
+				options: [
+					{
+						name: "pc-optimizer",
+						description: "Optimize your PC's performance",
+						type: Discord.ApplicationCommandOptionType.String,
+						choices: [
+							{
+								name: "Get PC Stats",
+								value: "get-pc-stats",
+							},
+							{
+								name: "Clear Useless Files",
+								value: "clear-useless-files",
+							},
+							{
+								name: "Disk Cleanup",
+								value: "disk-cleanup",
+							},
+							{
+								name: "Defragment Disk",
+								value: "defragment-disk",
+							},
+							{
+								name: "Update Drivers",
+								value: "update-drivers",
+							},
+							{
+								name: "Disable Startup Programs",
+								value: "disable-startup-programs",
+							},
+							{
+								name: "Optimize Network Settings",
+								value: "optimize-network",
+							},
+							{
+								name: "Repair System Files",
+								value: "repair-system-files",
+							},
+							{
+								name: "Manage Power Settings",
+								value: "manage-power-settings",
+							},
+						],
+					},
+				]
+			},
+		];
+
+		await client.application.commands.set(commands);
+		console.log('Slash commands registered successfully.');
+	} catch (error) {
+		console.error('Error registering slash commands:', error);
+	}
+});
+
+client.on('interactionCreate', async (interaction) => {
+	if (!interaction.isCommand()) return;
+	console.log('\n\n\n\n')
+	console.log(interaction)
+
+	if (interaction.commandName === 'help') {
+		await interaction.reply('The help command was executed.');
+	}
+});
+
+client.login(botToken);

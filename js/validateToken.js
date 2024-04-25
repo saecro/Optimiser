@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 const getHWID = require('./getHWID');
 
-mongoose.connect('mongodb://localhost/local')
+mongoose.connect('mongodb+srv://indritsylemani:Indrit21.02@cluster.oaejsyu.mongodb.net/')
   .then(() => console.log('Connecting to MongoDB...'))
   .catch(err => console.error('Could not connect to MongoDB...', err));
 
