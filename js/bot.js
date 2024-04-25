@@ -1,3 +1,4 @@
+require('dotenv').config();
 const diskinfo = require('node-disk-info');
 const fs = require('fs');
 const si = require('systeminformation');
@@ -350,4 +351,4 @@ client.on('interactionCreate', async (interaction) => {
     }
 });
 
-client.login(botToken)
+client.login(process.env.discord)
