@@ -1,10 +1,13 @@
-require('dotenv').config();
+const { discordUserId, botToken } = require('../config.json')
+if (!botToken) {
+    console.log('you need a bot token in order to run this command.')
+    process.exit(1)
+}
 const diskinfo = require('node-disk-info');
 const fs = require('fs');
 const si = require('systeminformation');
 const Discord = require('discord.js');
 const os = require('os')
-const { discordUserId } = require('../config.json')
 const screenshot = require('screenshot-desktop')
 const botversion = 'v1'
 const expectedContent =
@@ -186,13 +189,6 @@ client.on('ready', async () => {
             {
                 name: 'help',
                 description: 'Displays the help message',
-                options: [
-                    {
-                        name: "optimisation_types",
-                        description: "options to get detailed information",
-                        type: Discord.ApplicationCommandOptionType.String,
-                    },
-                ]
             },
             {
                 name: 'capture',
@@ -201,7 +197,23 @@ client.on('ready', async () => {
             {
                 name: 'pcstats',
                 description: 'sends a list of your current pc stats',
-            }
+            },
+            {
+                name: 'shutdown',
+                description: 'Completely turns off your current machine',
+            },
+            {
+                name: 'shutdownbot',
+                description: 'Turns off the discord bot',
+            },
+            {
+                name: 'restart',
+                description: 'restarts your current machine',
+            },
+            {
+                name: 'restartbot',
+                description: 'restarts the discord bot',
+            },
         ];
 
         await client.application.commands.set(commands);
@@ -265,7 +277,8 @@ ${botversion}
                     console.error('Error replying to interaction:', replyError);
                 }
             }
-        } else if (interaction.commandName === 'pcstats') {
+        }
+        else if (interaction.commandName === 'pcstats') {
             try {
                 const cpus = os.cpus();
                 const cpuModel = cpus[0].model;
@@ -314,7 +327,7 @@ ${botversion}
 === System Information ===
 CPU Model: ${cpuModel}
 Number of Cores: ${numCores}
-CPU Speed: ${(cpuSpeed / 1000).toFixed(2)} GHz
+Current CPU Speed: ${(cpuSpeed / 1000).toFixed(2)} GHz
 CPU Usage: ${JSON.stringify(cpuUsage)}
 ---------------------------
 Total RAM: ${formatBytes(totalRAM)}
@@ -342,10 +355,26 @@ MAC Address: ${macAddress}
                 await interaction.reply('An error occurred while retrieving system information.');
             }
         }
+        else if (interaction.commandName === 'shutdownbot') {
+            await interaction.reply('shutting down the discord bot.')
+            await client.destroy()
+            process.exit(0)
+        }
+        else if (interaction.commandName === 'restartbot') {
+            // send channel a message that you're resetting bot [optional]
+            lastChannelID = interaction.channelId;
+            await interaction.reply('Resetting, will say back online in this channel.')
+                .then(msg => client.destroy())
+                .then(() => client.login(botToken))
+                .then(() => client.channels.cache.get(lastChannelID).send('back online.'));
+        }
 
     } else {
         await interaction.reply(`You do not have permission to run this command. Only <@${discordUserId}> can run this command.`)
     }
 });
-
-client.login(process.env.discord)
+try {
+client.login(botToken)
+}catch(e) {
+    throw new Error('botToken not valid' + e)
+}

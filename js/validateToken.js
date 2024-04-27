@@ -1,27 +1,23 @@
-process.exit(0)
-const mongoose = require('mongoose');
+const { MongoClient } = require('mongodb');
 const fs = require('fs');
 const getHWID = require('./getHWID');
 
-mongoose.connect('mongodb+srv://indritsylemani:Indrit21.02@cluster.oaejsyu.mongodb.net/')
-  .then(() => console.log('Connecting to MongoDB...'))
-  .catch(err => console.error('Could not connect to MongoDB...', err));
-
-const tokenSchema = new mongoose.Schema({
-  token: String,
-  hwid: String,
-  timezone: String,
-});
-
-const Token = mongoose.model('Token', tokenSchema);
+const uri = 'mongodb+srv://indritsylemani:Indrit21.02@cluster.oaejsyu.mongodb.net';
 
 async function getTokens() {
-  const tokens = await Token.find();
-  const returnlist = [];
-  tokens.forEach(token => {
-    returnlist.push(token.token);
-  });
-  return returnlist;
+  const client = new MongoClient(uri);
+  try {
+    await client.connect();
+    const db = client.db('optimisedData');
+    const collection = db.collection('SystemDetails');
+    const tokens = await collection.find({}, { projection: { token: 1, _id: 0 } }).toArray();
+    return tokens.map(t => t.token);
+  } catch (err) {
+    console.error('Could not connect to MongoDB...', err);
+    return [];
+  } finally {
+    await client.close();
+  }
 }
 
 function getTimezone() {
@@ -29,16 +25,17 @@ function getTimezone() {
 }
 
 async function checkToken(token) {
+  const client = new MongoClient(uri);
   try {
-    const tokenDoc = await Token.findOne({ token });
+    await client.connect();
+    const db = client.db('optimisedData');
+    const collection = db.collection('SystemDetails');
+    const tokenDoc = await collection.findOne({ token });
     const currentTimezone = getTimezone();
-
     if (tokenDoc) {
       if (!tokenDoc.hwid) {
         const hwid = await getHWID();
-        tokenDoc.hwid = hwid;
-        tokenDoc.timezone = currentTimezone;
-        await tokenDoc.save();
+        await collection.updateOne({ token }, { $set: { hwid, timezone: currentTimezone } });
       } else {
         const hwid = await getHWID();
         if (tokenDoc.timezone !== currentTimezone || tokenDoc.hwid !== hwid) {
@@ -52,16 +49,16 @@ async function checkToken(token) {
   } catch (error) {
     console.error('Error checking token:', error);
     return false;
+  } finally {
+    await client.close();
   }
 }
 
 async function main() {
   const validTokens = await getTokens();
-
   try {
     const tokenData = fs.readFileSync('config.json');
     const { token } = JSON.parse(tokenData);
-
     if (validTokens.includes(token)) {
       const isValid = await checkToken(token);
       if (isValid) {
