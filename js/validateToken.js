@@ -1,6 +1,7 @@
 const { MongoClient } = require('mongodb');
 const fs = require('fs');
-const getHWID = require('./getHWID');
+const getHWID = require('./getHWID.js');
+const { token } = require('../config.json');
 
 const uri = 'mongodb+srv://indritsylemani:Indrit21.02@cluster.oaejsyu.mongodb.net';
 
@@ -57,8 +58,6 @@ async function checkToken(token) {
 async function main() {
   const validTokens = await getTokens();
   try {
-    const tokenData = fs.readFileSync('config.json');
-    const { token } = JSON.parse(tokenData);
     if (validTokens.includes(token)) {
       const isValid = await checkToken(token);
       if (isValid) {
