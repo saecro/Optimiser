@@ -4,9 +4,9 @@ const fs = require('fs');
 const si = require('systeminformation');
 const Discord = require('discord.js');
 const os = require('os')
-const { botToken } = require('../config.json')
+const { discordUserId } = require('../config.json')
 const screenshot = require('screenshot-desktop')
-const { MessageAttachment } = require('discord.js');
+const botversion = 'v1'
 const expectedContent =
     `@echo off
     rem Checking if node.js is installed
@@ -191,44 +191,6 @@ client.on('ready', async () => {
                         name: "optimisation_types",
                         description: "options to get detailed information",
                         type: Discord.ApplicationCommandOptionType.String,
-                        choices: [
-                            {
-                                name: "Get PC Stats",
-                                value: "get-pc-stats",
-                            },
-                            {
-                                name: "Clear Useless Files",
-                                value: "clear-useless-files",
-                            },
-                            {
-                                name: "Disk Cleanup",
-                                value: "disk-cleanup",
-                            },
-                            {
-                                name: "Defragment Disk",
-                                value: "defragment-disk",
-                            },
-                            {
-                                name: "Update Drivers",
-                                value: "update-drivers",
-                            },
-                            {
-                                name: "Disable Startup Programs",
-                                value: "disable-startup-programs",
-                            },
-                            {
-                                name: "Optimize Network Settings",
-                                value: "optimize-network",
-                            },
-                            {
-                                name: "Repair System Files",
-                                value: "repair-system-files",
-                            },
-                            {
-                                name: "Manage Power Settings",
-                                value: "manage-power-settings",
-                            },
-                        ],
                     },
                 ]
             },
@@ -257,140 +219,98 @@ client.on('interactionCreate', async (interaction) => {
             `**Help:** 
 \`\`\`
 ${botversion}
->Misc
-.help || .cmds - Sends this
-.settings - Shows bot.js settings
-.utilities - Shows bot.js utilitie
-@bot [prefix (optional)] - Sets prefix/shows info
+>Performance
+.setpriority [high/normal/low] - Sets the priority of the botting process to optimize resource allocation.
+.cpuaffinity [0-100] - Sets the CPU affinity for the botting process to limit CPU usage.
+.memoryLimit [MB] - Sets a memory usage limit for the botting process to prevent excessive memory consumption.
+.gpuacceleration [true/false] - Enables or disables GPU acceleration for the botting process.
 
->Bots
-.launch [user || user,user1,etc || all || offline || amount] (placeid) - Launches account into game, placeid defaults to Pls Donate if there is none
-.stop - Stops launching/relaunching accounts.
-.remove [user || user,user1,repeat || all || amount] - Moves the account into "accountstore.json"
-.restore [user || user,user1,repeat || all || amount] - Moves the account into "accounts.json"
-.premove || .void [accounts || accountstore] [user || user,user1,repeat || all || amount] - Permamently deletes the specificed users
-.terminate || .term [optional number] - Terminates all/specified instances
+>Monitoring
+.monitor [true/false] - Enables or disables real-time monitoring of system resources.
+.logresources [true/false] - Enables or disables logging of system resource usage to a file.
+.alerts [true/false] - Enables or disables alerts when system resources exceed specified thresholds.
+.setalerts [cpu/memory/gpu] [threshold] - Sets the threshold for triggering alerts for specific system resources.
 
->Info
-.accountStatus || .accounts || .acc - Shows if accounts are online or offline
-.stats || .pcStats - Shows CPU, PC temp, Ram usage, uptime, total earned during session
-.robuxAmount || .ra - Get balance of all your accounts
-.robuxAmountl || .ral - Total balance without accounts listed
-.transfer [user to trasnfer to] [shirt id] - Transfer Robux to one account
-.adurite - Automatically adds all bots in utils to adurite
-.cookies [user || user,user1,repeat || amount] - Dms you account cookies
-.uconfig - Dms you your util config with personal details excluded
+>Automation
+.scheduleRestart [time] - Schedules an automatic restart of the botting process at the specified time.
+.scheduleShutdown [time] - Schedules an automatic shutdown of the PC at the specified time.
+.autopause [true/false] - Enables or disables automatic pausing of the botting process when system resources are low.
+.setpausethreshold [cpu/memory/gpu] [threshold] - Sets the threshold for triggering an automatic pause based on system resources.
 
->Customisation
-.gen [number || accounts] - Generates new accounts
-.avatar [username || "all"] [user to copy] - Copies a user's avatar
-.displayname || .dis [username or "all"] [Displayname}- Changes display name of accounts
-.block [username || "all"] - Blocks all accounts
-.gamepass [username || "all"] - Sets up gamepass
-.group [username || "all"] - Joins a Roblox group for you
+>Maintenance
+.clearcache - Clears the cache and temporary files associated with the botting process.
+.defragment - Defragments the hard drive to improve performance.
+.updatedrivers - Checks for and installs updated drivers for the system.
+.disablebackground [true/false] - Disables or enables background processes and services to free up resources.
 
->PC
-.screenshot || .sc - Sends a screenshot of your pc
-.restartbot || .reb - Restarts the Discord bot
-.shutdownbot || .offb - Turns the Discord bot off
-.restart || .re - Restarts you pc
-.shutdown || .off - Shuts down pc\`\`\``
-        );
-    } else if (interaction.commandName == "settings") {
-        await interaction.reply(
-            `**Settings:** 
-\`\`\`
-${botversion}
->Toggleable
-.startlaunch || .sl [true/false] - Makes bots automatically launch offline on startup.
-.antiratelimit || .ar [true/false] - Prevents you from experiencing synapse rate limits, account relaunch logic is changed.
-.autoban || .ab [true/false] - Automatically removes banned accounts.
-.autogen || .ag [true/false] - Automatically generates accounts when a banned one gets removed (pairs with .autoban).
-.autominimize || .amin [true/false] - Enables or disables autominimize.
-.autorelaunch || .arl [true/false] - Auto relaunches accounts upon exit.
-.anonymous || .anon [true/false] - Makes launching/.acc accounts anonymous.
-
->Values
-.autorelaunchdelay || .ald [number] - Changes the delay between accounts relaunching.
-.launchdelay || .ld [number] - Changes the delay between accounts launching.
-.autominimizedelay || .amdel - Changes the time between an account launching and then being minimized.
-
->Status Customisation
-.rbx [acc/accs/all] - Total robux amount in status. This is a placeholder, doesnt work!
-
->Other
-.prefix || .pre [prefix] - Changes the bots prefix to this.
-.nopecha || .nkey [nopecha key] - Changes the nopechakey to this.
-.placeid || .pid [place id] - Changes what experience the accounts launch to.
-
->Utils
-.autogroup [true/false] - Automatically joins groups after generation.
-.ramautoimport || .rai [true/false] - Automatically imports accounts to ram after generation.
-.mainaccount || .ma [Main account] - Sets this as your main account in utils.
-
->Values
-.setvals - Shows what the values of every command is.\`\`\``
-        );
-    } else if (interaction.commandName === 'capture') {
-        try {
-            const img = await screenshot({ format: "png" });
-            await interaction.reply({
-                files: [{ attachment: img, name: "screenshot.png" }]
-            });
-        } catch (error) {
-            console.error('Error taking screenshot:', error);
+>Network
+.connectionspeed - Displays the current internet connection speed.
+.setbandwidthlimit [KB/s] - Sets a bandwidth limit for the botting process to prevent network congestion.
+.pingtest [server] - Performs a ping test to the specified server to check network latency.
+.dnsflush - Flushes the DNS cache to resolve network-related issues.
+\`\`\``)
+    }
+    if (interaction.user.id === discordUserId) {
+        if (interaction.commandName === 'capture') {
             try {
-                await interaction.reply('An error occurred while taking the screenshot.');
-            } catch (replyError) {
-                console.error('Error replying to interaction:', replyError);
+                const img = await screenshot({ format: "png" });
+                await interaction.reply({
+                    files: [{ attachment: img, name: "screenshot.png" }]
+                });
+            } catch (error) {
+                console.error('Error taking screenshot:', error);
+                try {
+                    await interaction.reply('An error occurred while taking the screenshot.');
+                } catch (replyError) {
+                    console.error('Error replying to interaction:', replyError);
+                }
             }
-        }
-    } else if (interaction.commandName === 'pcstats') {
-        try {
-            const cpus = os.cpus();
-            const cpuModel = cpus[0].model;
-            const numCores = cpus.length;
-            const cpuSpeed = cpus[0].speed;
-            const cpuUsage = process.cpuUsage();
+        } else if (interaction.commandName === 'pcstats') {
+            try {
+                const cpus = os.cpus();
+                const cpuModel = cpus[0].model;
+                const numCores = cpus.length;
+                const cpuSpeed = cpus[0].speed;
+                const cpuUsage = process.cpuUsage();
 
-            const totalRAM = os.totalmem();
-            const freeRAM = os.freemem();
-            const usedRAM = totalRAM - freeRAM;
-            const ramUsagePercent = ((usedRAM / totalRAM) * 100).toFixed(2);
+                const totalRAM = os.totalmem();
+                const freeRAM = os.freemem();
+                const usedRAM = totalRAM - freeRAM;
+                const ramUsagePercent = ((usedRAM / totalRAM) * 100).toFixed(2);
 
-            const osType = os.type();
-            const osRelease = os.release();
-            const osUptime = os.uptime();
-            const osLoadAvg = os.loadavg();
+                const osType = os.type();
+                const osRelease = os.release();
+                const osUptime = os.uptime();
+                const osLoadAvg = os.loadavg();
 
-            const networkInterfaces = os.networkInterfaces();
-            const primaryInterface = Object.values(networkInterfaces).find(iface => iface && iface.length > 0);
-            const ipAddress = primaryInterface ? primaryInterface[0].address : 'Unknown';
-            const macAddress = primaryInterface ? primaryInterface[0].mac : 'Unknown';
+                const networkInterfaces = os.networkInterfaces();
+                const primaryInterface = Object.values(networkInterfaces).find(iface => iface && iface.length > 0);
+                const ipAddress = primaryInterface ? primaryInterface[0].address : 'Unknown';
+                const macAddress = primaryInterface ? primaryInterface[0].mac : 'Unknown';
 
-            const formatBytes = (bytes) => {
-                const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-                if (bytes === 0) return '0 Bytes';
-                const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
-                return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
-            };
+                const formatBytes = (bytes) => {
+                    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+                    if (bytes === 0) return '0 Bytes';
+                    const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
+                    return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
+                };
 
-            const formatTime = (seconds) => {
-                const hours = Math.floor(seconds / 3600);
-                const minutes = Math.floor((seconds % 3600) / 60);
-                const secs = Math.floor(seconds % 60);
-                return `${hours} hours, ${minutes} minutes, ${secs} seconds`;
-            };
+                const formatTime = (seconds) => {
+                    const hours = Math.floor(seconds / 3600);
+                    const minutes = Math.floor((seconds % 3600) / 60);
+                    const secs = Math.floor(seconds % 60);
+                    return `${hours} hours, ${minutes} minutes, ${secs} seconds`;
+                };
 
-            const disks = await diskinfo.getDiskInfo();
-            const primaryDisk = disks[0];
-            const totalStorage = primaryDisk.blocks;
-            const freeStorage = primaryDisk.available;
-            const usedStorage = totalStorage - freeStorage;
-            const storageUsagePercent = ((usedStorage / totalStorage) * 100).toFixed(2);
+                const disks = await diskinfo.getDiskInfo();
+                const primaryDisk = disks[0];
+                const totalStorage = primaryDisk.blocks;
+                const freeStorage = primaryDisk.available;
+                const usedStorage = totalStorage - freeStorage;
+                const storageUsagePercent = ((usedStorage / totalStorage) * 100).toFixed(2);
 
-            const message =
-                `\`\`\`
+                const message =
+                    `\`\`\`
 === System Information ===
 CPU Model: ${cpuModel}
 Number of Cores: ${numCores}
@@ -416,12 +336,15 @@ IP Address: ${ipAddress}
 MAC Address: ${macAddress}
 \`\`\``;
 
-            await interaction.reply(message);
-        } catch (error) {
-            console.error('Error retrieving system information:', error);
-            await interaction.reply('An error occurred while retrieving system information.');
+                await interaction.reply(message);
+            } catch (error) {
+                console.error('Error retrieving system information:', error);
+                await interaction.reply('An error occurred while retrieving system information.');
+            }
         }
 
+    } else {
+        await interaction.reply(`You do not have permission to run this command. Only <@${discordUserId}> can run this command.`)
     }
 });
 
