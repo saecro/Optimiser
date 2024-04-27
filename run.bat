@@ -27,6 +27,8 @@ if not exist config.json (
   exit
 )
 
+node js/startup.js
+
 echo Validate the token
 node js/validateToken.js
 if errorlevel 1 (
