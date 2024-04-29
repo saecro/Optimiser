@@ -11,7 +11,8 @@ async function validateToken() {
     const hwid = await getHWID();
     const timezone = await getTimezone();
 
-    const response = await axios.get('http://192.168.50.182:3000/api/validate-token', {
+    console.log('getting conection')
+    const response = await axios.get('http://192.168.50.182:80/', {
       params: {
         token,
         hwid,
