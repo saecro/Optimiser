@@ -1,4 +1,5 @@
 const axios = require('axios');
+const getHWID = require('./getHWID')
 const { token } = require('../config.json');
 
 async function getTimezone() {

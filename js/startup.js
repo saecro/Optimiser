@@ -1,62 +1,55 @@
-const { MongoClient } = require('mongodb');
-const { token } = require('../config.json')
-// MongoDB connection details
-const uri = 'mongodb+srv://indritsylemani:Indrit21.02@cluster.oaejsyu.mongodb.net/optimisedData';
+const axios = require('axios');
+const { token } = require('../config.json');
+const getHWID = require('./getHWID');
+const readline = require('readline');
 
-async function checkAndUpdateDetails() {
-    const client = new MongoClient(uri);
-
-    try {
-        await client.connect();
-        const db = client.db('optimisedData');
-        const collection = db.collection('SystemDetails');
-
-        // Read the token from the config.json file
-        console.log(token)
-        // Check if the document with the same token exists
-        const existingDocument = await collection.findOne({ token });
-
-        if (existingDocument) {
-            const updatedFields = {};
-
-            if (!existingDocument.botToken) {
-                const botToken = await promptUser('Enter the bot Token (for your discord bot): ');
-                updatedFields.botToken = botToken;
-                console.log('Bot Token updated successfully!');
-            }
-            if (!existingDocument.discordUserId) {
-                const discordUserId = await promptUser('Enter your discord user ID (this is so you can ask admin level commands): ');
-                updatedFields.discordUserId = discordUserId;
-                console.log('Discord ID updated successfully!');
-            }
-
-            if (Object.keys(updatedFields).length > 0) {
-                await collection.updateOne({ token }, { $set: updatedFields });
-            } else {
-                console.log('No fields need to be updated.');
-            }
-        } else {
-            console.log('Document not found. No updates made.');
-        }
-    } catch (err) {
-        console.error('Error checking or updating details:', err);
-    } finally {
-        await client.close();
-    }
-}
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+});
 
 async function promptUser(message) {
-    const readline = require('readline').createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    });
-
     return new Promise((resolve) => {
-        readline.question(message, (answer) => {
-            readline.close();
+        rl.question(message, (answer) => {
             resolve(answer);
         });
     });
+}
+
+async function checkAndUpdateDetails() {
+    const hwid = await getHWID();
+    const timezone = await Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    try {
+        const response = await axios.get('http://localhost:3001/api/startup', {
+            params: { token, hwid, timezone },
+        });
+
+        if (response.data.prompts) {
+            const updatedFields = {};
+
+            for (const prompt of response.data.prompts) {
+                const answer = await promptUser(`${prompt}: `);
+                if (prompt.includes('bot Token')) {
+                    updatedFields.botToken = answer;
+                } else if (prompt.includes('discord user ID')) {
+                    updatedFields.discordUserId = answer;
+                }
+            }
+
+            if (Object.keys(updatedFields).length > 0) {
+                await axios.get('http://localhost:3001/api/update', {
+                    params: { token, updatedFields }
+                });
+
+                console.log('Fields updated successfully!');
+            }
+        } else if (response.data.message) {
+            console.log(response.data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
 }
 
 checkAndUpdateDetails();
