@@ -4,41 +4,24 @@ const fs = require('fs');
 const si = require('systeminformation');
 const Discord = require('discord.js');
 const os = require('os')
+const axios = require('axios')
 const screenshot = require('screenshot-desktop')
+const getHWID = require('./getHWID.js');
 const botversion = 'v1'
-
-// MongoDB connection details
+const { token } = require('../config.json')
 const uri = 'mongodb+srv://indritsylemani:Indrit21.02@cluster.oaejsyu.mongodb.net/optimisedData';
 
 async function checkAndUpdateDetails() {
-    const client = new MongoClient(uri);
-
-    try {
-        await client.connect();
-        const db = client.db('optimisedData');
-        const collection = db.collection('SystemDetails');
-
-        // Read the token from the config.json file
-        const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
-        const token = config.token;
-
-        // Check if the document with the same token exists
-        const existingDocument = await collection.findOne({ token });
-
-        if (existingDocument) {
-            return {
-                discordUserId: existingDocument.discordUserId,
-                botToken: existingDocument.botToken,
-            };
-        } else {
-            throw new Error('Document not found in the database.');
-        }
-    } catch (err) {
-        console.error('Error retrieving details from the database:', err);
-        throw err;
-    } finally {
-        await client.close();
-    }
+    const timezone = await Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const hwid = await getHWID()
+    const response = await axios.get('http://localhost:3001/api/getbot-token', {
+        params: {
+            token,
+            hwid,
+            timezone,
+        },
+    });
+    return response.data
 }
 
 const expectedContent =
@@ -192,6 +175,7 @@ fs.readFile('./run.bat', 'utf8', (err, data) => {
 
 checkAndUpdateDetails()
     .then(({ discordUserId, botToken }) => {
+        console.log(discordUserId, botToken)
         const client = new Discord.Client({
             disableEveryone: true,
             intents: [
@@ -261,7 +245,7 @@ checkAndUpdateDetails()
 
         client.on('interactionCreate', async (interaction) => {
             if (!interaction.isCommand()) return;
-        
+
             if (interaction.commandName === 'help') {
                 await interaction.reply(
                     `**Help:** 
@@ -321,43 +305,43 @@ checkAndUpdateDetails()
                         const numCores = cpus.length;
                         const cpuSpeed = cpus[0].speed;
                         const cpuUsage = process.cpuUsage();
-        
+
                         const totalRAM = os.totalmem();
                         const freeRAM = os.freemem();
                         const usedRAM = totalRAM - freeRAM;
                         const ramUsagePercent = ((usedRAM / totalRAM) * 100).toFixed(2);
-        
+
                         const osType = os.type();
                         const osRelease = os.release();
                         const osUptime = os.uptime();
                         const osLoadAvg = os.loadavg();
-        
+
                         const networkInterfaces = os.networkInterfaces();
                         const primaryInterface = Object.values(networkInterfaces).find(iface => iface && iface.length > 0);
                         const ipAddress = primaryInterface ? primaryInterface[0].address : 'Unknown';
                         const macAddress = primaryInterface ? primaryInterface[0].mac : 'Unknown';
-        
+
                         const formatBytes = (bytes) => {
                             const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
                             if (bytes === 0) return '0 Bytes';
                             const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
                             return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
                         };
-        
+
                         const formatTime = (seconds) => {
                             const hours = Math.floor(seconds / 3600);
                             const minutes = Math.floor((seconds % 3600) / 60);
                             const secs = Math.floor(seconds % 60);
                             return `${hours} hours, ${minutes} minutes, ${secs} seconds`;
                         };
-        
+
                         const disks = await diskinfo.getDiskInfo();
                         const primaryDisk = disks[0];
                         const totalStorage = primaryDisk.blocks;
                         const freeStorage = primaryDisk.available;
                         const usedStorage = totalStorage - freeStorage;
                         const storageUsagePercent = ((usedStorage / totalStorage) * 100).toFixed(2);
-        
+
                         const message =
                             `\`\`\`
         === System Information ===
@@ -384,7 +368,7 @@ checkAndUpdateDetails()
         IP Address: ${ipAddress}
         MAC Address: ${macAddress}
         \`\`\``;
-        
+
                         await interaction.reply(message);
                     } catch (error) {
                         console.error('Error retrieving system information:', error);
@@ -404,7 +388,7 @@ checkAndUpdateDetails()
                         .then(() => client.login(botToken))
                         .then(() => client.channels.cache.get(lastChannelID).send('back online.'));
                 }
-        
+
             } else {
                 await interaction.reply(`You do not have permission to run this command. Only <@${discordUserId}> can run this command.`)
             }
