@@ -342,32 +342,31 @@ checkAndUpdateDetails()
                         const usedStorage = totalStorage - freeStorage;
                         const storageUsagePercent = ((usedStorage / totalStorage) * 100).toFixed(2);
 
-                        const message =
-                            `\`\`\`
-        === System Information ===
-        CPU Model: ${cpuModel}
-        Number of Cores: ${numCores}
-        Current CPU Speed: ${(cpuSpeed / 1000).toFixed(2)} GHz
-        CPU Usage: ${JSON.stringify(cpuUsage)}
-        ---------------------------
-        Total RAM: ${formatBytes(totalRAM)}
-        Used RAM: ${formatBytes(usedRAM)}
-        Free RAM: ${formatBytes(freeRAM)}
-        RAM Usage: ${ramUsagePercent}%
-        ---------------------------
-        Total Storage: ${formatBytes(totalStorage)}
-        Used Storage: ${formatBytes(usedStorage)}
-        Free Storage: ${formatBytes(freeStorage)}
-        Storage Usage: ${storageUsagePercent}%
-        ---------------------------
-        Operating System: ${osType}
-        OS Release: ${osRelease}
-        System Uptime: ${formatTime(osUptime)}
-        System Load Average (1, 5, 15 min): ${osLoadAvg}
-        ---------------------------
-        IP Address: ${ipAddress}
-        MAC Address: ${macAddress}
-        \`\`\``;
+                        const message = `\`\`\`
+=== System Information ===
+CPU Model: ${cpuModel}
+Number of Cores: ${numCores}
+Current CPU Speed: ${(cpuSpeed / 1000).toFixed(2)} GHz
+CPU Usage: ${JSON.stringify(cpuUsage)}
+---------------------------
+Total RAM: ${formatBytes(totalRAM)}
+Used RAM: ${formatBytes(usedRAM)}
+Free RAM: ${formatBytes(freeRAM)}
+RAM Usage: ${ramUsagePercent}%
+---------------------------
+Total Storage: ${formatBytes(totalStorage)}
+Used Storage: ${formatBytes(usedStorage)}
+Free Storage: ${formatBytes(freeStorage)}
+Storage Usage: ${storageUsagePercent}%
+---------------------------
+Operating System: ${osType}
+OS Release: ${osRelease}
+System Uptime: ${formatTime(osUptime)}
+System Load Average (1, 5, 15 min): ${osLoadAvg}
+---------------------------
+IP Address: ${ipAddress}
+MAC Address: ${macAddress}
+\`\`\``;
 
                         await interaction.reply(message);
                     } catch (error) {
