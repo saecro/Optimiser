@@ -1,4 +1,3 @@
-const { MongoClient } = require('mongodb')
 const diskinfo = require('node-disk-info');
 const fs = require('fs');
 const si = require('systeminformation');
@@ -9,7 +8,6 @@ const screenshot = require('screenshot-desktop')
 const getHWID = require('./getHWID.js');
 const botversion = 'v1'
 const { token } = require('../config.json')
-const uri = 'mongodb+srv://indritsylemani:Indrit21.02@cluster.oaejsyu.mongodb.net/optimisedData';
 
 async function checkAndUpdateDetails() {
     const timezone = await Intl.DateTimeFormat().resolvedOptions().timeZone;

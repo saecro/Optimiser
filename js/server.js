@@ -1,3 +1,4 @@
+const crypto = require('./customCrypto');
 const path = require('path');
 const express = require('express');
 const { MongoClient } = require('mongodb');
@@ -162,6 +163,35 @@ app.get('/api/update', async (req, res) => {
     }
 });
 
+app.get('/api/createtoken', async () => {
+    const client = new MongoClient(uri);
+
+    try {
+        await client.connect();
+        const db = client.db('optimisedData');
+        const collection = db.collection('SystemDetails');
+
+        const randomString = crypto.customUUID(128);
+        const currentTimezone = ""
+        const hwid = '';
+        const botToken = '';
+        const discordUserId = '';
+        const result = await collection.insertOne({
+            token: randomString,
+            hwid: hwid,
+            timezone: currentTimezone,
+            botToken: botToken,
+            discordUserId: discordUserId
+        });
+        console.log('config saved to MongoDB:', randomString);
+        res.json({ token: randomString })
+    } catch (err) {
+        console.error('Error saving UUID to MongoDB:', err);
+    } finally {
+        await client.close();
+    }
+
+})
 app.get('/', async (req, res) => {
     console.log('got default connection to api');
     res.send('Welcome to the API');
