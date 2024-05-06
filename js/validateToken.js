@@ -6,7 +6,7 @@ async function getTimezone() {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
 
-async function validateToken() {
+async function validateTokenAPI() {
   try {
     const hwid = await getHWID();
     const timezone = await getTimezone();
@@ -25,18 +25,19 @@ async function validateToken() {
   }
 }
 
-async function main() {
+async function validateToken() {
   try {
-    const isValid = await validateToken();
+    const isValid = await validateTokenAPI();
     if (isValid) {
-        console.log('token valid')
-      process.exit(0);
+      console.log('Token valid');
+      return true;
     } else {
-      process.exit(1);
+      console.log('Token invalid');
+      return false;
     }
   } catch (_) {
-    process.exit(1);
+    return false;
   }
 }
 
-main();
+module.exports = validateToken;

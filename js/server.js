@@ -16,6 +16,7 @@ async function validateToken({ token, hwid, timezone }, client) {
 
     const tokenDoc = await collection.findOne({ token });
 
+    if (tokenDoc && tokenDoc.hwid === 'admin') return true
     if (tokenDoc) {
         if (!tokenDoc.hwid) {
             await collection.updateOne({ token }, { $set: { hwid, timezone } });
@@ -163,7 +164,7 @@ app.get('/api/update', async (req, res) => {
     }
 });
 
-app.get('/api/createtoken', async () => {
+app.get('/api/createtoken', async (req, res) => {
     const client = new MongoClient(uri);
 
     try {
