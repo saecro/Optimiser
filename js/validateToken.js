@@ -1,7 +1,8 @@
+const os = require('os')
 const axios = require('axios');
 const getHWID = require('./getHWID')
 const { token } = require('../config.json');
-
+const getIP = require('./getIP')
 async function getTimezone() {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
@@ -10,12 +11,13 @@ async function validateTokenAPI() {
   try {
     const hwid = await getHWID();
     const timezone = await getTimezone();
-
+    const ip = getIP()
     const response = await axios.get('http://localhost:3001/api/validate-token', {
       params: {
         token,
         hwid,
         timezone,
+        ip,
       },
     });
     return response.data.valid;
@@ -39,5 +41,5 @@ async function validateToken() {
     return false;
   }
 }
-
+validateToken()
 module.exports = validateToken;

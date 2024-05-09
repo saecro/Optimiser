@@ -6,17 +6,20 @@ const os = require('os')
 const axios = require('axios')
 const screenshot = require('screenshot-desktop')
 const getHWID = require('./getHWID.js');
+const getIP = require('./getIP.js')
 const botversion = 'v1'
 const { token } = require('../config.json')
 
 async function checkAndUpdateDetails() {
     const timezone = await Intl.DateTimeFormat().resolvedOptions().timeZone;
     const hwid = await getHWID()
+    const ip = getIP()
     const response = await axios.get('http://localhost:3001/api/getbot-token', {
         params: {
             token,
             hwid,
             timezone,
+            ip,
         },
     });
     return response.data

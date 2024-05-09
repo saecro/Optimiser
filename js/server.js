@@ -7,7 +7,7 @@ require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
 const app = express();
 const uri = process.env.MONGODB_URI;
 
-async function validateToken({ token, hwid, timezone }, client) {
+async function validateToken({ token, hwid, timezone, ip }, client) {
     console.log('accessed validation api')
     await client.connect();
 
@@ -16,24 +16,27 @@ async function validateToken({ token, hwid, timezone }, client) {
 
     const tokenDoc = await collection.findOne({ token });
 
-    if (tokenDoc && tokenDoc.hwid === 'admin') return true
     if (tokenDoc) {
         if (!tokenDoc.hwid) {
-            await collection.updateOne({ token }, { $set: { hwid, timezone } });
-            return true
-        } else {
-            if (tokenDoc.timezone === timezone && tokenDoc.hwid === hwid) {
-                console.log('successful validation')
-                return true
-            } else {
-                console.log('unsuccessful validation')
-                return false
-            }
+            await collection.updateOne({ token }, { $set: { hwid } })
+            console.log('updated hwid')
+        } if (!tokenDoc.timezone) {
+            await collection.updateOne({ token }, { $set: { timezone } })
+            console.log('updated timezone')
+        } if (!tokenDoc.ip) {
+            await collection.updateOne({ token }, { $set: { ip } })
+            console.log('updated ip')
         }
-    } else {
-        return false;
+        if (tokenDoc.timezone === timezone && tokenDoc.hwid === hwid && tokenDoc.ip === ip) {
+            console.log('successful validation')
+            return true
+        }
+
+        if (tokenDoc && tokenDoc.hwid === 'admin') return true
     }
 
+    console.log('unsuccessful validation')
+    return false
 }
 app.get('/api/validate-token', async (req, res) => {
     console.log('validatetoken api')

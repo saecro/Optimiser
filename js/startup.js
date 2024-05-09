@@ -1,8 +1,8 @@
 const axios = require('axios');
 const { token } = require('../config.json');
-const getHWID = require('./getHWID');
+const getHWID = require('./getHWID.js');
 const readline = require('readline');
-
+const getIP = require('./getIP.js')
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -19,10 +19,10 @@ async function promptUser(message) {
 async function startup() {
   const hwid = await getHWID();
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
+  const ip = getIP()
   try {
     const response = await axios.get('http://localhost:3001/api/startup', {
-      params: { token, hwid, timezone },
+      params: { token, hwid, timezone, ip },
     });
 
     if (response.data.prompts) {
