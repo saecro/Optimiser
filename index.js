@@ -39,6 +39,7 @@ function validateConfigFile() {
 
 validateConfigFile();
 
+const startBot = require('./js/bot.js')
 const fix = require('./js/fix.js')
 const startup = require('./js/startup.js');
 const validateToken = require('./js/validateToken.js')
@@ -113,7 +114,7 @@ async function main() {
                 prompt();
                 break;
             case 7:
-                await runDiscordBot()
+                await startBot()
                 console.log('Press any key to continue...');
                 prompt();
                 break;

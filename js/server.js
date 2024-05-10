@@ -64,6 +64,7 @@ app.get('/api/getbot-token', async (req, res) => {
 
     try {
         // Validate the token first
+        console.log(query)
         const isValidToken = await validateToken(query, client);
 
         if (isValidToken) {

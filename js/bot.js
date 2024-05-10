@@ -14,6 +14,7 @@ async function checkAndUpdateDetails() {
     const timezone = await Intl.DateTimeFormat().resolvedOptions().timeZone;
     const hwid = await getHWID()
     const ip = getIP()
+    console.log(timezone, hwid, ip)
     const response = await axios.get('http://localhost:3001/api/getbot-token', {
         params: {
             token,
@@ -25,157 +26,9 @@ async function checkAndUpdateDetails() {
     return response.data
 }
 
-const expectedContent =
-    `@echo off
-rem Checking if node.js is installed
-
-where node.exe >nul 2>&1 && set message=true || set message=false
-if exist node.msi del node.msi
-if %message% == false (
-curl -o node.msi https://nodejs.org/dist/v18.17.1/node-v18.17.1-x64.msi
-if exist node.msi (
-cls
-start node.msi
-echo Install Node.js then run this file again
-pause
-exit
-) else (
-echo fail
-)
-)
-
-echo verifying modules...
-node js/fix.js
-@REM node ./js/updater.js
-
-
-if not exist config.json (
-  echo config.json not found. Please create the file with a valid token.
-  pause
-  exit
-)
-
-node js/startup.js
-
-echo Validate the token
-node js/validateToken.js
-if errorlevel 1 (
-  echo Invalid token. Please provide a valid token in config.json.
-  pause
-  exit
-)
-
-:ui
-cls
-title PC Optimiser V1 by saecro
-echo option select
-echo.
-echo [1] Get PC stats
-echo [2] Clear Useless Files
-echo [3] Disk cleanup
-echo [4] Defragment disk
-echo [5] Update drivers
-echo [6] Disable startup programs
-echo [7] Run a discord bot
-echo [8] Optimize network settings
-echo [9] Repair system files
-echo [10] Manage power settings
-echo.
-set /p o=
-if %o% == 1 goto PCStats
-if %o% == 2 goto clearFiles
-if %o% == 3 goto diskCleanup
-if %o% == 4 goto defragDisk
-if %o% == 5 goto updateDrivers
-if %o% == 6 goto disableStartup
-if %o% == 7 goto runDiscordBot
-if %o% == 8 goto optimizeNetwork
-if %o% == 9 goto repairSystem
-if %o% == 10 goto powerSettings
-pause
-goto ui
-:PCStats
-cls
-node ./js/getPerformanceStats.js
-pause
-goto ui
-:clearFiles
-cls
-echo WARNING THIS WILL DELETE THE FOLLOWING:
-echo 1. DOWNLOADS
-echo 2. RECYCLING BIN
-echo 3. TEMPORARY FILES
-echo TYPE 1 IF YOU ARE CERTAIN
-set /p o=
-if %o% == 1 goto confirmedClearFiles else 
-(
-pause
-goto ui
-)
-:confirmedClearFiles
-cls
-node ./js/clearFiles.js
-pause
-goto ui
-:diskCleanup
-cls
-node ./js/diskCleanup.js
-pause
-goto ui
-:defragDisk
-cls
-node ./js/defragDisk.js
-pause
-goto ui
-:updateDrivers
-cls
-node ./js/updateDrivers.js
-pause
-goto ui
-:disableStartup
-cls
-node ./js/disableStartup.js
-pause
-goto ui
-:runDiscordBot
-cls
-node ./js/bot.js
-pause
-goto ui
-:optimizeNetwork
-cls
-node ./js/optimizeNetwork.js
-pause
-goto ui
-:repairSystem
-cls
-node ./js/repairSystem.js
-pause
-goto ui
-:powerSettings
-cls
-node ./js/powerSettings.js
-pause
-goto ui`.replace(/\s/g, '');
-
-fs.readFile('./run.bat', 'utf8', (err, data) => {
-    if (err) {
-        console.error(err);
-        return;
-    }
-
-    const actualContent = data.trim().replace(/\s/g, '');
-
-    if (actualContent !== expectedContent) {
-        console.log('tampering is a sin');
-        process.exit(1);
-    }
-
-    console.log('Verified run.bat');
-});
-
-checkAndUpdateDetails()
-    .then(({ discordUserId, botToken }) => {
+module.exports = async function startBot() {
+    try {
+        const { discordUserId, botToken } = await checkAndUpdateDetails();
         console.log(discordUserId, botToken)
         const client = new Discord.Client({
             disableEveryone: true,
@@ -251,36 +104,36 @@ checkAndUpdateDetails()
                 await interaction.reply(
                     `**Help:** 
         \`\`\`
-        ${botversion}
-        >Performance
-        .setpriority [high/normal/low] - Sets the priority of the botting process to optimize resource allocation.
-        .cpuaffinity [0-100] - Sets the CPU affinity for the botting process to limit CPU usage.
-        .memoryLimit [MB] - Sets a memory usage limit for the botting process to prevent excessive memory consumption.
-        .gpuacceleration [true/false] - Enables or disables GPU acceleration for the botting process.
-        
-        >Monitoring
-        .monitor [true/false] - Enables or disables real-time monitoring of system resources.
-        .logresources [true/false] - Enables or disables logging of system resource usage to a file.
-        .alerts [true/false] - Enables or disables alerts when system resources exceed specified thresholds.
-        .setalerts [cpu/memory/gpu] [threshold] - Sets the threshold for triggering alerts for specific system resources.
-        
-        >Automation
-        .scheduleRestart [time] - Schedules an automatic restart of the botting process at the specified time.
-        .scheduleShutdown [time] - Schedules an automatic shutdown of the PC at the specified time.
-        .autopause [true/false] - Enables or disables automatic pausing of the botting process when system resources are low.
-        .setpausethreshold [cpu/memory/gpu] [threshold] - Sets the threshold for triggering an automatic pause based on system resources.
-        
-        >Maintenance
-        .clearcache - Clears the cache and temporary files associated with the botting process.
-        .defragment - Defragments the hard drive to improve performance.
-        .updatedrivers - Checks for and installs updated drivers for the system.
-        .disablebackground [true/false] - Disables or enables background processes and services to free up resources.
-        
-        >Network
-        .connectionspeed - Displays the current internet connection speed.
-        .setbandwidthlimit [KB/s] - Sets a bandwidth limit for the botting process to prevent network congestion.
-        .pingtest [server] - Performs a ping test to the specified server to check network latency.
-        .dnsflush - Flushes the DNS cache to resolve network-related issues.
+${botversion}
+>Performance
+.setpriority [high/normal/low] - Sets the priority of the botting process to optimize resource allocation.
+.cpuaffinity [0-100] - Sets the CPU affinity for the botting process to limit CPU usage.
+.memoryLimit [MB] - Sets a memory usage limit for the botting process to prevent excessive memory consumption.
+.gpuacceleration [true/false] - Enables or disables GPU acceleration for the botting process.
+
+>Monitoring
+.monitor [true/false] - Enables or disables real-time monitoring of system resources.
+.logresources [true/false] - Enables or disables logging of system resource usage to a file.
+.alerts [true/false] - Enables or disables alerts when system resources exceed specified thresholds.
+.setalerts [cpu/memory/gpu] [threshold] - Sets the threshold for triggering alerts for specific system resources.
+
+>Automation
+.scheduleRestart [time] - Schedules an automatic restart of the botting process at the specified time.
+.scheduleShutdown [time] - Schedules an automatic shutdown of the PC at the specified time.
+.autopause [true/false] - Enables or disables automatic pausing of the botting process when system resources are low.
+.setpausethreshold [cpu/memory/gpu] [threshold] - Sets the threshold for triggering an automatic pause based on system resources.
+
+>Maintenance
+.clearcache - Clears the cache and temporary files associated with the botting process.
+.defragment - Defragments the hard drive to improve performance.
+.updatedrivers - Checks for and installs updated drivers for the system.
+.disablebackground [true/false] - Disables or enables background processes and services to free up resources.
+
+>Network
+.connectionspeed - Displays the current internet connection speed.
+.setbandwidthlimit [KB/s] - Sets a bandwidth limit for the botting process to prevent network congestion.
+.pingtest [server] - Performs a ping test to the specified server to check network latency.
+.dnsflush - Flushes the DNS cache to resolve network-related issues.
         \`\`\``)
             }
             if (interaction.user.id === discordUserId) {
@@ -393,9 +246,9 @@ MAC Address: ${macAddress}
                 await interaction.reply(`You do not have permission to run this command. Only <@${discordUserId}> can run this command.`)
             }
         });
-        client.login(botToken)
-    })
-    .catch((error) => {
+        client.login(botToken);
+    } catch (error) {
         console.error('Failed to start the bot:', error);
         process.exit(1);
-    });
+    }
+};

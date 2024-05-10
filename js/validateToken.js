@@ -37,9 +37,9 @@ async function validateToken() {
       console.log('Token invalid');
       return false;
     }
-  } catch (_) {
+  } catch (e) {
     return false;
   }
 }
-validateToken()
+
 module.exports = validateToken;
