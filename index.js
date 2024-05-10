@@ -1,3 +1,5 @@
+const fix = require('./js/fix.js')
+const startup = require('./js/startup.js');
 const fs = require('fs');
 
 const configFilePath = './config.json';
@@ -37,11 +39,17 @@ function validateConfigFile() {
     }
 }
 
-validateConfigFile();
+async function validateModules() {
+    try {
+        await Promise.all([fix(), startup()]);
+        console.log('All validations completed successfully.');
+    } catch (error) {
+        console.error('Validation failed:', error);
+    }
+}
 
-const startBot = require('./js/bot.js')
-const fix = require('./js/fix.js')
-const startup = require('./js/startup.js');
+validateModules()
+validateConfigFile();
 const validateToken = require('./js/validateToken.js')
 const prompt = require("prompt-sync")({ sigint: true });
 const getPerformanceStats = require('./js/getPerformanceStats.js')
@@ -68,11 +76,10 @@ async function main() {
         const isTokenValid = await validateToken();
 
         if (!isTokenValid) {
-            console.error('Token validation failed. Stopping the script.');
+            console.error('Token validation failed.');
             process.exit(1)
         }
 
-        await Promise.all([fix(), startup()]);
         console.log('All validations completed successfully.');
     } catch (error) {
         console.error('Validation failed:', error);
@@ -114,7 +121,7 @@ async function main() {
                 prompt();
                 break;
             case 7:
-                await startBot()
+                await runDiscordBot()
                 console.log('Press any key to continue...');
                 prompt();
                 break;

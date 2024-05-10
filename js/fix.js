@@ -2,11 +2,11 @@ const child = require("child_process");
 
 function checkModules() {
   try {
-    child.execSync("npm list", { stdio: "ignore" });
+    child.execSync("npm list", { stdio: "inherit" });
     return true;
   } catch (e) {
     console.log(`Installing Modules\nPlease Wait...`);
-    child.execSync(`npm i`, { stdio: "ignore" });
+    child.execSync(`npm i`, { stdio: "inherit" });
     return false;
   }
 }
